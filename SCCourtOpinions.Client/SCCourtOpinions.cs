@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
@@ -11,6 +12,29 @@ namespace SCCourtOpinions.Client
     {
         protected abstract string BaseUrl { get; }
         protected string OpinionsBaseUrl = "http://www.sccourts.org";
+
+        private readonly HttpClientHandler _handler;
+
+        protected SCCourtOpinions(string proxyHost = null, int proxyPort = 80, string proxyUser = null, string proxyPass = null)
+        {
+            _handler = new HttpClientHandler();
+
+            if (proxyHost != null)
+            {
+                var proxy = new WebProxy()
+                {
+                    Address = new Uri($"{proxyHost}:{proxyPort}"),
+                };
+
+                if (proxyUser != null)
+                {
+                    proxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
+                }
+
+                _handler.Proxy = proxy;
+                _handler.UseProxy = true;
+            }
+        }
 
         public async Task<List<Opinion>> GetOpinions(int? year = null, int? month = null)
         {
@@ -24,7 +48,7 @@ namespace SCCourtOpinions.Client
                 month = DateTime.Now.Month;
             }
 
-            using (var http = new HttpClient())
+            using (var http = new HttpClient(_handler, false))
             {
                 var url = $"{BaseUrl}?year={year}&month={month}";
                 var content = await http.GetStringAsync(url);

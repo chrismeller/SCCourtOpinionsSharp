@@ -24,7 +24,12 @@ namespace SCCourtOpinions.Host
 
         public static async Task RunAppeals()
         {
-            var client = new AppealsCourt();
+            var proxyHost = ConfigurationManager.AppSettings["Proxy.Host"];
+            var proxyPort = ConfigurationManager.AppSettings["Proxy.Port"];
+            var proxyUser = ConfigurationManager.AppSettings["Proxy.User"];
+            var proxyPass = ConfigurationManager.AppSettings["Proxy.Pass"];
+
+            var client = new AppealsCourt(proxyHost, Convert.ToInt32(proxyPort), proxyUser, proxyPass);
             var opinions = await client.GetOpinions();
 
             Console.WriteLine("Got {0} opinions for Appeals.", opinions.Count);
@@ -58,7 +63,12 @@ namespace SCCourtOpinions.Host
 
         public static async Task RunSupreme()
         {
-            var client = new SupremeCourt();
+            var proxyHost = ConfigurationManager.AppSettings["Proxy.Host"];
+            var proxyPort = ConfigurationManager.AppSettings["Proxy.Port"];
+            var proxyUser = ConfigurationManager.AppSettings["Proxy.User"];
+            var proxyPass = ConfigurationManager.AppSettings["Proxy.Pass"];
+
+            var client = new SupremeCourt(proxyHost, Convert.ToInt32(proxyPort), proxyUser, proxyPass);
             var opinions = await client.GetOpinions();
 
             Console.WriteLine("Got {0} opinions for Supreme.", opinions.Count);
